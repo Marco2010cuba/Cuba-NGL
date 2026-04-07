@@ -29,6 +29,9 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 20px var(--neon-red-glow);
         }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -47,12 +50,12 @@
             <div class="neon-border rounded-lg p-6">
                 <h2 class="text-xl font-semibold mb-4">Comenzar</h2>
                 <div class="space-y-3">
-                    <a href="/register" class="neon-button block text-center py-3 px-6 rounded-lg text-white font-semibold no-underline">
+                    <button onclick="showRegister()" class="neon-button block text-center py-3 px-6 rounded-lg text-white font-semibold">
                         Crear Cuenta
-                    </a>
-                    <a href="/login" class="neon-button block text-center py-3 px-6 rounded-lg text-white font-semibold no-underline">
+                    </button>
+                    <button onclick="showLogin()" class="neon-button block text-center py-3 px-6 rounded-lg text-white font-semibold">
                         Iniciar Sesión
-                    </a>
+                    </button>
                 </div>
             </div>
 
@@ -85,5 +88,289 @@
             <p>Hecho con ❤️ para Cuba</p>
         </div>
     </div>
+
+    <!-- Register Form (Hidden by default) -->
+    <div id="registerForm" class="hidden fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center p-4 z-50">
+        <div class="max-w-md w-full neon-border rounded-lg p-6">
+            <h2 class="text-2xl font-bold mb-4 text-center">Crear Cuenta</h2>
+            <form onsubmit="handleRegister(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Nombre de usuario</label>
+                    <input type="text" id="regUsername" required class="w-full p-3 bg-gray-900 border-2 border-gray-700 rounded-lg text-white" placeholder="Tu nombre de usuario">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Contraseña</label>
+                    <input type="password" id="regPassword" required class="w-full p-3 bg-gray-900 border-2 border-gray-700 rounded-lg text-white" placeholder="Tu contraseña">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Correo (opcional)</label>
+                    <input type="email" id="regEmail" class="w-full p-3 bg-gray-900 border-2 border-gray-700 rounded-lg text-white" placeholder="tu@email.com">
+                </div>
+                <button type="submit" class="neon-button w-full py-3 rounded-lg text-white font-semibold">
+                    Crear Cuenta
+                </button>
+                <button type="button" onclick="hideRegister()" class="w-full py-2 text-gray-400">
+                    Cancelar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Login Form (Hidden by default) -->
+    <div id="loginForm" class="hidden fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center p-4 z-50">
+        <div class="max-w-md w-full neon-border rounded-lg p-6">
+            <h2 class="text-2xl font-bold mb-4 text-center">Iniciar Sesión</h2>
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Nombre de usuario</label>
+                    <input type="text" id="loginUsername" required class="w-full p-3 bg-gray-900 border-2 border-gray-700 rounded-lg text-white" placeholder="Tu nombre de usuario">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Contraseña</label>
+                    <input type="password" id="loginPassword" required class="w-full p-3 bg-gray-900 border-2 border-gray-700 rounded-lg text-white" placeholder="Tu contraseña">
+                </div>
+                <button type="submit" class="neon-button w-full py-3 rounded-lg text-white font-semibold">
+                    Iniciar Sesión
+                </button>
+                <button type="button" onclick="hideLogin()" class="w-full py-2 text-gray-400">
+                    Cancelar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard (Hidden by default) -->
+    <div id="dashboard" class="hidden fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center p-4 z-50">
+        <div class="max-w-md w-full neon-border rounded-lg p-6">
+            <h2 class="text-2xl font-bold mb-4 text-center">Dashboard</h2>
+            <div class="space-y-4">
+                <div class="neon-border rounded p-4">
+                    <h3 class="font-semibold mb-2">Tu Link Personal</h3>
+                    <div class="bg-gray-800 p-3 rounded">
+                        <code class="text-green-400 text-sm">https://nglcuba.vercel.app/u/tu-usuario</code>
+                    </div>
+                    <button onclick="copyLink()" class="neon-button w-full py-2 rounded text-white">
+                        📋 Copiar Link
+                    </button>
+                </div>
+                <div class="neon-border rounded p-4">
+                    <h3 class="font-semibold mb-2">Mensajes Recientes</h3>
+                    <div id="messagesList" class="space-y-2 max-h-40 overflow-y-auto">
+                        <p class="text-gray-400 text-center">No tienes mensajes aún</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="neon-button w-full py-3 rounded text-white">
+                    🚪 Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message Form (Hidden by default) -->
+    <div id="messageForm" class="hidden fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center p-4 z-50">
+        <div class="max-w-md w-full neon-border rounded-lg p-6">
+            <h2 class="text-2xl font-bold mb-4 text-center">Enviar Mensaje Anónimo</h2>
+            <div class="text-center mb-4">
+                <div class="w-20 h-20 bg-gray-700 rounded-full mx-auto mb-2">
+                    <div class="w-full h-full bg-gray-600 rounded-full flex items-center justify-center">
+                        <span class="text-2xl">👤</span>
+                    </div>
+                </div>
+                <h3 class="text-xl">Para: Usuario</h3>
+            </div>
+            <form onsubmit="sendMessage(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Tu mensaje anónimo</label>
+                    <textarea id="messageText" required rows="4" class="w-full p-3 bg-gray-900 border-2 border-gray-700 rounded-lg text-white" placeholder="Escribe tu mensaje aquí..."></textarea>
+                </div>
+                <button type="submit" class="neon-button w-full py-3 rounded-lg text-white font-semibold">
+                    📤 Enviar Mensaje
+                </button>
+                <button type="button" onclick="hideMessageForm()" class="w-full py-2 text-gray-400">
+                    Cancelar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Demo functionality using localStorage
+        let currentUser = null;
+
+        function showRegister() {
+            document.getElementById('registerForm').classList.remove('hidden');
+        }
+
+        function hideRegister() {
+            document.getElementById('registerForm').classList.add('hidden');
+        }
+
+        function showLogin() {
+            document.getElementById('loginForm').classList.remove('hidden');
+        }
+
+        function hideLogin() {
+            document.getElementById('loginForm').classList.add('hidden');
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
+            const email = document.getElementById('regEmail').value;
+
+            if (username.length < 3) {
+                alert('El nombre de usuario debe tener al menos 3 caracteres');
+                return;
+            }
+
+            if (password.length < 6) {
+                alert('La contraseña debe tener al menos 6 caracteres');
+                return;
+            }
+
+            // Store user in localStorage
+            const user = {
+                uid: 'demo_' + Math.random().toString(36).substr(2, 9),
+                username: username,
+                email: email || username + '@nglcuba.com',
+                password: password,
+                createdAt: new Date().toISOString()
+            };
+
+            localStorage.setItem('ngl_user', JSON.stringify(user));
+            currentUser = user;
+            
+            // Show dashboard
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            updateDashboard();
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (username.length < 3) {
+                alert('El nombre de usuario debe tener al menos 3 caracteres');
+                return;
+            }
+
+            if (password.length < 6) {
+                alert('La contraseña debe tener al menos 6 caracteres');
+                return;
+            }
+
+            // Check if user exists (demo)
+            const users = JSON.parse(localStorage.getItem('ngl_users') || '[]');
+            const existingUser = users.find(u => u.username === username);
+
+            if (!existingUser) {
+                alert('Usuario no encontrado. Regístrate primero.');
+                return;
+            }
+
+            if (existingUser.password !== password) {
+                alert('Contraseña incorrecta');
+                return;
+            }
+
+            currentUser = existingUser;
+            
+            // Show dashboard
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            updateDashboard();
+        }
+
+        function logout() {
+            localStorage.removeItem('ngl_user');
+            currentUser = null;
+            
+            // Show main page
+            document.getElementById('dashboard').classList.add('hidden');
+            location.reload();
+        }
+
+        function copyLink() {
+            const link = `https://nglcuba.vercel.app/u/${currentUser.username}`;
+            navigator.clipboard.writeText(link);
+            alert('¡Link copiado: ' + link);
+        }
+
+        function updateDashboard() {
+            if (!currentUser) return;
+
+            const messages = JSON.parse(localStorage.getItem('ngl_messages') || '[]');
+            const userMessages = messages.filter(m => m.recipientId === currentUser.uid);
+            
+            const messagesList = document.getElementById('messagesList');
+            
+            if (userMessages.length === 0) {
+                messagesList.innerHTML = '<p class="text-gray-400 text-center">No tienes mensajes aún</p>';
+            } else {
+                messagesList.innerHTML = userMessages.map(msg => `
+                    <div class="neon-border rounded p-3">
+                        <p class="text-white">${msg.content}</p>
+                        <p class="text-gray-400 text-xs">${new Date(msg.createdAt).toLocaleString()}</p>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function showSendMessageForm(username) {
+            document.getElementById('messageForm').classList.remove('hidden');
+            document.querySelector('#messageForm h3').textContent = `Para: ${username}`;
+        }
+
+        function hideMessageForm() {
+            document.getElementById('messageForm').classList.add('hidden');
+        }
+
+        function sendMessage(event) {
+            event.preventDefault();
+            const messageText = document.getElementById('messageText').value;
+
+            if (!messageText.trim()) {
+                alert('Escribe un mensaje');
+                return;
+            }
+
+            // Store message
+            const messages = JSON.parse(localStorage.getItem('ngl_messages') || '[]');
+            const newMessage = {
+                id: Date.now().toString(),
+                recipientId: 'demo_' + Math.random().toString(36).substr(2, 9),
+                content: messageText,
+                senderName: 'Anónimo',
+                createdAt: new Date().toISOString()
+            };
+
+            messages.push(newMessage);
+            localStorage.setItem('ngl_messages', JSON.stringify(messages));
+
+            alert('¡Mensaje enviado exitosamente!');
+            document.getElementById('messageText').value = '';
+            hideMessageForm();
+        }
+
+        // Check if user is logged in
+        window.onload = function() {
+            const user = localStorage.getItem('ngl_user');
+            if (user) {
+                currentUser = JSON.parse(user);
+                document.getElementById('dashboard').classList.remove('hidden');
+                updateDashboard();
+            }
+        };
+
+        // Handle URL parameters for message form
+        const urlParams = new URLSearchParams(window.location.search);
+        const username = urlParams.get('u');
+        if (username) {
+            showSendMessageForm(username);
+        }
+    </script>
 </body>
 </html>
