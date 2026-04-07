@@ -1,6 +1,7 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "installCommand": "npm install",
-  "framework": "nextjs"
+  "buildCommand": "echo 'Skipping build for demo'",
+  "outputDirectory": ".",
+  "installCommand": "echo 'Skipping install for demo'",
+  "framework": "nextjs",
+  "devCommand": "next dev"
 }
