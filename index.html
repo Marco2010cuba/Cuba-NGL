@@ -89,11 +89,11 @@
                 <form onsubmit="handleLogin(event)" class="space-y-6">
                     <div>
                         <label class="block text-sm font-medium mb-3 text-gray-300">Nombre de usuario</label>
-                        <input type="text" id="loginUsername" required class="w-full p-4 bg-black border-2 border-gray-600 rounded-xl text-white text-lg focus:border-red-500 focus:outline-none transition-colors" placeholder="Ej: usuario123">
+                        <input type="text" id="loginUsername" required class="w-full p-4 bg-black border-2 border-gray-600 rounded-xl text-white text-lg focus:border-red-500 focus:outline-none transition-colors" placeholder="Tu nombre de usuario">
                     </div>
                     <div>
                         <label class="block text-sm font-medium mb-3 text-gray-300">Contraseña</label>
-                        <input type="password" id="loginPassword" required class="w-full p-4 bg-black border-2 border-gray-600 rounded-xl text-white text-lg focus:border-red-500 focus:outline-none transition-colors" placeholder="Ej: contraseña123">
+                        <input type="password" id="loginPassword" required class="w-full p-4 bg-black border-2 border-gray-600 rounded-xl text-white text-lg focus:border-red-500 focus:outline-none transition-colors" placeholder="Tu contraseña">
                     </div>
                     <button type="submit" class="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 rounded-xl py-4 text-white font-bold text-lg transition-all duration-300 hover:scale-105 shadow-lg">
                         Iniciar Sesión
@@ -128,18 +128,18 @@
                         </div>
                         
                         <div class="space-y-3 text-gray-300">
-                            <p class="flex items-center text-lg">
-                                <img src="https://img.icons8.com/color/48/gmail.png" alt="Gmail" class="w-6 h-6 mr-3">
-                                <a href="mailto:msanchez132010@gmail.com" class="text-blue-400 hover:text-blue-300 transition-colors">msanchez132010@gmail.com</a>
-                            </p>
-                            <p class="flex items-center text-lg">
+                            <a href="https://wa.me/+17088385699" target="_blank" class="flex items-center text-lg">
                                 <img src="https://img.icons8.com/color/48/whatsapp.png" alt="WhatsApp" class="w-6 h-6 mr-3">
-                                <a href="https://wa.me/5317088385699" target="_blank" class="text-green-400 hover:text-green-300 transition-colors">+53 17088385699</a>
-                            </p>
-                            <p class="flex items-center text-lg">
+                                <span>WhatsApp</span>
+                            </a>
+                            <a href="mailto:msanchez132010@gmail.com" class="flex items-center text-lg">
+                                <img src="https://img.icons8.com/color/48/gmail.png" alt="Gmail" class="w-6 h-6 mr-3">
+                                <span>Email</span>
+                            </a>
+                            <a href="https://maps.google.com/?q=Camagüey,Cuba" target="_blank" class="flex items-center text-lg">
                                 <img src="https://img.icons8.com/color/48/google-maps.png" alt="Maps" class="w-6 h-6 mr-3">
-                                <a href="https://maps.google.com/?q=Camagüey,Cuba" target="_blank" class="text-red-400 hover:text-red-300 transition-colors">Camagüey, Cuba</a>
-                            </p>
+                                <span>Ubicación</span>
+                            </a>
                             <p class="flex items-center text-lg">
                                 <img src="https://img.icons8.com/color/48/globe.png" alt="Web" class="w-6 h-6 mr-3">
                                 <span>Plataforma de mensajes anónimos</span>
@@ -227,15 +227,15 @@
             <form onsubmit="handleRegister(event)" class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium mb-2 text-gray-300">Nombre de usuario</label>
-                    <input type="text" id="regUsername" required class="w-full p-3 bg-black border-2 border-gray-600 rounded-xl text-white focus:border-blue-500 focus:outline-none transition-colors" placeholder="Ej: usuario123">
+                    <input type="text" id="regUsername" required class="w-full p-3 bg-black border-2 border-gray-600 rounded-xl text-white focus:border-blue-500 focus:outline-none transition-colors" placeholder="Tu nombre de usuario">
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2 text-gray-300">Email (opcional)</label>
-                    <input type="email" id="regEmail" class="w-full p-3 bg-black border-2 border-gray-600 rounded-xl text-white focus:border-blue-500 focus:outline-none transition-colors" placeholder="Ej: correo@email.com">
+                    <input type="email" id="regEmail" class="w-full p-3 bg-black border-2 border-gray-600 rounded-xl text-white focus:border-blue-500 focus:outline-none transition-colors" placeholder="Tu email">
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2 text-gray-300">Contraseña</label>
-                    <input type="password" id="regPassword" required class="w-full p-3 bg-black border-2 border-gray-600 rounded-xl text-white focus:border-blue-500 focus:outline-none transition-colors" placeholder="Ej: contraseña123">
+                    <input type="password" id="regPassword" required class="w-full p-3 bg-black border-2 border-gray-600 rounded-xl text-white focus:border-blue-500 focus:outline-none transition-colors" placeholder="Tu contraseña">
                 </div>
                 <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-xl py-3 text-white font-semibold transition-all duration-300 hover:scale-105">
                     Crear Cuenta
