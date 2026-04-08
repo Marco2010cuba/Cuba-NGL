@@ -214,28 +214,46 @@
 
     <!-- Message Form (Hidden by default) -->
     <div id="messageForm" class="hidden fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center p-4 z-50">
-        <div class="max-w-md w-full neon-border rounded-lg p-6">
-            <h2 class="text-2xl font-bold mb-4 text-center">Enviar Mensaje Anónimo</h2>
-            <div class="text-center mb-4">
-                <div class="w-20 h-20 bg-gray-700 rounded-full mx-auto mb-2">
+        <div class="max-w-md w-full">
+            <!-- Profile Header -->
+            <div class="text-center mb-8">
+                <div class="w-24 h-24 bg-gray-700 rounded-full mx-auto mb-4 neon-border">
                     <div class="w-full h-full bg-gray-600 rounded-full flex items-center justify-center">
-                        <span class="text-2xl">👤</span>
+                        <span class="text-4xl">👤</span>
                     </div>
                 </div>
-                <h3 class="text-xl">Para: <span id="messageRecipient">Usuario</span></h3>
+                <h1 class="text-4xl font-bold mb-2" id="messageRecipient" style="color: var(--neon-red); text-shadow: 0 0 10px var(--neon-red-glow);">
+                    Usuario
+                </h1>
+                <p class="text-xl text-gray-300 mb-6">Recibe mensajes anónimos</p>
             </div>
-            <form onsubmit="sendMessage(event)" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium mb-2">Tu mensaje anónimo</label>
-                    <textarea id="messageText" required rows="4" class="w-full p-3 bg-gray-900 border-2 border-gray-700 rounded-lg text-white" placeholder="Escribe tu mensaje aquí..."></textarea>
-                </div>
-                <button type="submit" class="neon-button w-full py-3 rounded-lg text-white font-semibold">
-                    📤 Enviar Mensaje
+
+            <!-- Message Form -->
+            <div class="neon-border rounded-lg p-6">
+                <h2 class="text-xl font-semibold mb-4 text-center">Enviar mensaje anónimo</h2>
+                <form onsubmit="sendMessage(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Tu mensaje anónimo</label>
+                        <textarea id="messageText" required rows="4" class="w-full p-3 bg-gray-900 border-2 border-gray-700 rounded-lg text-white resize-none" placeholder="Escribe tu mensaje aquí..."></textarea>
+                    </div>
+                    <button type="submit" class="neon-button w-full py-3 rounded-lg text-white font-semibold text-lg">
+                        📤 Enviar Mensaje
+                    </button>
+                </form>
+            </div>
+
+            <!-- Back Button -->
+            <div class="text-center mt-6">
+                <button onclick="hideMessageForm()" class="text-gray-400 hover:text-gray-300 transition-colors">
+                    ← Volver a NGL Cuba
                 </button>
-                <button type="button" onclick="hideMessageForm()" class="w-full py-2 text-gray-400">
-                    Cancelar
-                </button>
-            </form>
+            </div>
+
+            <!-- Footer -->
+            <div class="text-center mt-8 text-gray-500 text-sm">
+                <p>Creado por Marco • Cuba 🇨🇺</p>
+                <p>© 2024 NGL Cuba</p>
+            </div>
         </div>
     </div>
 
@@ -249,6 +267,20 @@
             if (userData) {
                 currentUser = JSON.parse(userData);
                 showDashboard();
+            }
+            
+            // Check if we're on a user profile page
+            checkUserProfile();
+        }
+
+        // Check if we're on a user profile page
+        function checkUserProfile() {
+            const path = window.location.pathname;
+            if (path.startsWith('/u/')) {
+                const username = path.substring(3); // Remove '/u/' from path
+                if (username && !currentUser) {
+                    showMessageForm(username);
+                }
             }
         }
 
@@ -455,9 +487,19 @@
                 return;
             }
 
+            // Get username from URL or from current user
+            const path = window.location.pathname;
+            let recipientUsername = '';
+            
+            if (path.startsWith('/u/')) {
+                recipientUsername = path.substring(3); // Remove '/u/' from path
+            } else if (currentUser) {
+                recipientUsername = currentUser.displayName;
+            }
+
             const newMessage = {
                 id: Date.now().toString(),
-                recipientUsername: currentUser.displayName,
+                recipientUsername: recipientUsername,
                 content: messageText,
                 senderName: 'Anónimo',
                 createdAt: new Date().toISOString()
@@ -468,14 +510,13 @@
 
             alert('¡Mensaje enviado exitosamente!');
             document.getElementById('messageText').value = '';
-            hideMessageForm();
-        }
-
-        // Check URL parameters for message form
-        const urlParams = new URLSearchParams(window.location.search);
-        const username = urlParams.get('u');
-        if (username && !currentUser) {
-            showMessageForm(username);
+            
+            // If on user profile page, show success and stay there
+            if (path.startsWith('/u/')) {
+                alert('¡Mensaje enviado exitosamente a ' + recipientUsername + '!');
+            } else {
+                hideMessageForm();
+            }
         }
 
         // Initialize
