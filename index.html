@@ -244,6 +244,53 @@
         </div>
     </div>
 
+    <!-- Admin Panel (Hidden by default) -->
+    <div id="adminPanel" class="hidden fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center p-4 z-50">
+        <div class="max-w-2xl w-full border-2 border-red-500 rounded-2xl p-8 shadow-xl">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold bg-gradient-to-r from-red-400 to-pink-400 bg-clip-text text-transparent">
+                    Panel de Administrador
+                </h2>
+                <button onclick="hideAdminPanel()" class="text-gray-400 hover:text-gray-300 transition-colors">
+                    ✕
+                </button>
+            </div>
+            
+            <div class="space-y-6">
+                <!-- Users Section -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4 text-red-400">Usuarios Registrados</h3>
+                    <div id="usersList" class="space-y-3 max-h-64 overflow-y-auto">
+                        <!-- Users will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Messages Section -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4 text-red-400">Todos los Mensajes</h3>
+                    <div id="allMessagesList" class="space-y-3 max-h-64 overflow-y-auto">
+                        <!-- Messages will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Stats Section -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4 text-red-400">Estadísticas</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-black bg-opacity-50 p-4 rounded-xl border border-gray-600">
+                            <div class="text-3xl font-bold text-red-400" id="totalUsers">0</div>
+                            <div class="text-sm text-gray-400">Total Usuarios</div>
+                        </div>
+                        <div class="bg-black bg-opacity-50 p-4 rounded-xl border border-gray-600">
+                            <div class="text-3xl font-bold text-green-400" id="totalMessages">0</div>
+                            <div class="text-sm text-gray-400">Total Mensajes</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Dashboard (Hidden by default) -->
     <div id="dashboard" class="hidden fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center p-4 z-50">
         <div class="max-w-4xl w-full max-h-screen overflow-y-auto">
@@ -506,8 +553,72 @@
         let currentUser = null;
         let messages = [];
 
+        // Check for admin access
+        function checkAdminAccess() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const adminKey = urlParams.get('admin');
+            
+            if (adminKey === 'ngl2024admin') {
+                showAdminPanel();
+            }
+        }
+
+        // Show admin panel
+        function showAdminPanel() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('adminPanel').classList.remove('hidden');
+            loadAdminData();
+        }
+
+        // Hide admin panel
+        function hideAdminPanel() {
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+        }
+
+        // Load admin data
+        function loadAdminData() {
+            const users = JSON.parse(localStorage.getItem('ngl_users') || '[]');
+            const messages = JSON.parse(localStorage.getItem('ngl_messages') || '[]');
+            
+            // Display users
+            const usersList = document.getElementById('usersList');
+            usersList.innerHTML = users.map(user => `
+                <div class="bg-black bg-opacity-50 p-3 rounded-xl border border-gray-600">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-white">${user.username}</div>
+                            <div class="text-sm text-gray-400">${user.email}</div>
+                        </div>
+                        <div class="text-sm text-gray-400">
+                            ${new Date(user.createdAt).toLocaleDateString()}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Display messages
+            const allMessagesList = document.getElementById('allMessagesList');
+            allMessagesList.innerHTML = messages.map(msg => `
+                <div class="bg-black bg-opacity-50 p-3 rounded-xl border border-gray-600">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="font-bold text-white">${msg.recipient}</div>
+                        <div class="text-sm text-gray-400">${new Date(msg.createdAt).toLocaleString()}</div>
+                    </div>
+                    <div class="text-white">${msg.content}</div>
+                </div>
+            `).join('');
+            
+            // Update stats
+            document.getElementById('totalUsers').textContent = users.length;
+            document.getElementById('totalMessages').textContent = messages.length;
+        }
+
         // Load user data
         function loadUser() {
+            // Check for admin access first
+            checkAdminAccess();
+            
             // Check for current user session
             const currentUserData = localStorage.getItem('ngl_current_user');
             
