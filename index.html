@@ -5,97 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NGL Cuba - Mensajes Anónimos</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script type="module">
-        // Use localStorage fallback for immediate functionality
-        // Firebase will be configured later with real credentials
-        
-        // Mock Firebase functions for now
-        window.firebaseAuth = null;
-        window.firebaseDB = null;
-        
-        // Mock authentication functions
-        window.createUserWithEmailAndPassword = async (auth, email, password) => {
-            // Simulate Firebase Auth with localStorage
-            const users = JSON.parse(localStorage.getItem('ngl_users') || '[]');
-            const existingUser = users.find(u => u.email === email);
-            
-            if (existingUser) {
-                throw { code: 'auth/email-already-in-use', message: 'Email already in use' };
-            }
-            
-            const newUser = {
-                uid: 'user_' + Date.now(),
-                email: email,
-                user: { uid: 'user_' + Date.now() }
-            };
-            
-            return { user: newUser };
-        };
-        
-        window.signInWithEmailAndPassword = async (auth, email, password) => {
-            // Simulate Firebase Auth with localStorage
-            const users = JSON.parse(localStorage.getItem('ngl_users') || '[]');
-            const user = users.find(u => u.email === email && u.password === password);
-            
-            if (!user) {
-                throw { code: 'auth/user-not-found', message: 'User not found' };
-            }
-            
-            return { user: { uid: user.uid, email: user.email } };
-        };
-        
-        window.signOut = async (auth) => {
-            // Mock sign out
-            return Promise.resolve();
-        };
-        
-        window.onAuthStateChanged = (auth, callback) => {
-            // Mock auth state change
-            const currentUser = JSON.parse(localStorage.getItem('ngl_current_user') || 'null');
-            callback(currentUser);
-        };
-        
-        // Mock Firestore functions
-        window.setDoc = async (docRef, data) => {
-            // Simulate Firestore set with localStorage
-            const users = JSON.parse(localStorage.getItem('ngl_users') || '[]');
-            users.push(data);
-            localStorage.setItem('ngl_users', JSON.stringify(users));
-            return Promise.resolve();
-        };
-        
-        window.getDoc = async (docRef) => {
-            // Simulate Firestore get with localStorage
-            const users = JSON.parse(localStorage.getItem('ngl_users') || '[]');
-            const user = users.find(u => u.uid === docRef.id);
-            return { data: () => user };
-        };
-        
-        window.addDoc = async (collectionRef, data) => {
-            // Simulate Firestore add with localStorage
-            const messages = JSON.parse(localStorage.getItem('ngl_messages') || '[]');
-            messages.push({ ...data, id: Date.now().toString() });
-            localStorage.setItem('ngl_messages', JSON.stringify(messages));
-            return Promise.resolve({ id: Date.now().toString() });
-        };
-        
-        window.getDocs = async (query) => {
-            // Simulate Firestore query with localStorage
-            const messages = JSON.parse(localStorage.getItem('ngl_messages') || '[]');
-            return {
-                forEach: (callback) => {
-                    messages.forEach(callback);
-                }
-            };
-        };
-        
-        window.collection = (db, name) => ({ name });
-        window.doc = (db, collection, id) => ({ id });
-        window.query = (collection, ...constraints) => collection;
-        window.where = (field, op, value) => ({ field, op, value });
-        window.orderBy = (field, direction) => ({ field, direction });
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            overflow-x: hidden;
+        }
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+        }
         :root {
             --neon-red: #ff0040;
             --neon-red-glow: #ff0040;
@@ -133,7 +64,12 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body>
+    <!-- Particles Background -->
+    <div id="particles-js"></div>
+    
+    <!-- Content Wrapper -->
+    <div class="content-wrapper min-h-screen flex items-center justify-center p-4">
     <div class="max-w-md w-full">
         <!-- Header -->
         <div class="text-center mb-8">
@@ -387,6 +323,153 @@
             </div>
         </div>
     </div>
+
+    <!-- Particles.js Script -->
+    <script>
+        particlesJS("particles-js", {
+            "particles": {
+                "number": {
+                    "value": 80,
+                    "density": {
+                        "enable": true,
+                        "value_area": 800
+                    }
+                },
+                "color": { "value": "#ffffff" },
+                "shape": {
+                    "type": "circle"
+                },
+                "opacity": {
+                    "value": 0.7,
+                    "random": true
+                },
+                "size": {
+                    "value": 3,
+                    "random": true
+                },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 150,
+                    "color": "#ffffff",
+                    "opacity": 0.5,
+                    "width": 1
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 2,
+                    "direction": "none",
+                    "random": true,
+                    "straight": false,
+                    "out_mode": "bounce",
+                    "bounce": true
+                }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": { "enable": true, "mode": "grab" },
+                    "onclick": { "enable": true, "mode": "push" }
+                },
+                "modes": {
+                    "grab": { "distance": 200, "line_linked": { "opacity": 1 } },
+                    "push": { "particles_nb": 4 }
+                }
+            },
+            "retina_detect": true
+        });
+    </script>
+
+    <!-- Firebase/LocalStorage Script -->
+    <script type="module">
+        // Use localStorage fallback for immediate functionality
+        // Firebase will be configured later with real credentials
+        
+        // Mock Firebase functions for now
+        window.firebaseAuth = null;
+        window.firebaseDB = null;
+        
+        // Mock authentication functions
+        window.createUserWithEmailAndPassword = async (auth, email, password) => {
+            // Simulate Firebase Auth with localStorage
+            const users = JSON.parse(localStorage.getItem('ngl_users') || '[]');
+            const existingUser = users.find(u => u.email === email);
+            
+            if (existingUser) {
+                throw { code: 'auth/email-already-in-use', message: 'Email already in use' };
+            }
+            
+            const newUser = {
+                uid: 'user_' + Date.now(),
+                email: email,
+                user: { uid: 'user_' + Date.now() }
+            };
+            
+            return { user: newUser };
+        };
+        
+        window.signInWithEmailAndPassword = async (auth, email, password) => {
+            // Simulate Firebase Auth with localStorage
+            const users = JSON.parse(localStorage.getItem('ngl_users') || '[]');
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (!user) {
+                throw { code: 'auth/user-not-found', message: 'User not found' };
+            }
+            
+            return { user: { uid: user.uid, email: user.email } };
+        };
+        
+        window.signOut = async (auth) => {
+            // Mock sign out
+            return Promise.resolve();
+        };
+        
+        window.onAuthStateChanged = (auth, callback) => {
+            // Mock auth state change
+            const currentUser = JSON.parse(localStorage.getItem('ngl_current_user') || 'null');
+            callback(currentUser);
+        };
+        
+        // Mock Firestore functions
+        window.setDoc = async (docRef, data) => {
+            // Simulate Firestore set with localStorage
+            const users = JSON.parse(localStorage.getItem('ngl_users') || '[]');
+            users.push(data);
+            localStorage.setItem('ngl_users', JSON.stringify(users));
+            return Promise.resolve();
+        };
+        
+        window.getDoc = async (docRef) => {
+            // Simulate Firestore get with localStorage
+            const users = JSON.parse(localStorage.getItem('ngl_users') || '[]');
+            const user = users.find(u => u.uid === docRef.id);
+            return { data: () => user };
+        };
+        
+        window.addDoc = async (collectionRef, data) => {
+            // Simulate Firestore add with localStorage
+            const messages = JSON.parse(localStorage.getItem('ngl_messages') || '[]');
+            messages.push({ ...data, id: Date.now().toString() });
+            localStorage.setItem('ngl_messages', JSON.stringify(messages));
+            return Promise.resolve({ id: Date.now().toString() });
+        };
+        
+        window.getDocs = async (query) => {
+            // Simulate Firestore query with localStorage
+            const messages = JSON.parse(localStorage.getItem('ngl_messages') || '[]');
+            return {
+                forEach: (callback) => {
+                    messages.forEach(callback);
+                }
+            };
+        };
+        
+        window.collection = (db, name) => ({ name });
+        window.doc = (db, collection, id) => ({ id });
+        window.query = (collection, ...constraints) => collection;
+        window.where = (field, op, value) => ({ field, op, value });
+        window.orderBy = (field, direction) => ({ field, direction });
+    </script>
 
     <script>
         let currentUser = null;
