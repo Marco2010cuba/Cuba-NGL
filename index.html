@@ -6,9 +6,10 @@
     <title>NGL Cuba - Mensajes Anónimos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module">
+        // Firebase imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { getFirestore, collection, doc, set, get, query, where, add, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, query, where, addDoc, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
         // Firebase configuration
         const firebaseConfig = {
@@ -24,6 +25,23 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+
+        // Make Firebase available globally
+        window.firebaseAuth = auth;
+        window.firebaseDB = db;
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.signOut = signOut;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.setDoc = setDoc;
+        window.getDoc = getDoc;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.collection = collection;
+        window.doc = doc;
+        window.query = query;
+        window.where = where;
+        window.orderBy = orderBy;
     </script>
     <style>
         :root {
@@ -326,10 +344,10 @@
         // Load user data
         function loadUser() {
             // Listen for auth state changes
-            onAuthStateChanged(auth, (user) => {
+            window.onAuthStateChanged(window.firebaseAuth, (user) => {
                 if (user) {
                     // User is signed in, get user data from Firestore
-                    get(doc(db, "users", user.uid)).then((userDoc) => {
+                    window.getDoc(window.doc(window.firebaseDB, "users", user.uid)).then((userDoc) => {
                         const userData = userDoc.data();
                         if (userData) {
                             currentUser = {
@@ -443,11 +461,11 @@
 
             try {
                 // Create user with Firebase Auth
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const userCredential = await window.createUserWithEmailAndPassword(window.firebaseAuth, email, password);
                 const user = userCredential.user;
 
                 // Save user data to Firestore
-                await set(doc(db, "users", user.uid), {
+                await window.setDoc(window.doc(window.firebaseDB, "users", user.uid), {
                     uid: user.uid,
                     username: username,
                     email: email,
@@ -467,8 +485,11 @@
                 showDashboard();
                 
             } catch (error) {
+                console.error('Error en registro:', error);
                 if (error.code === 'auth/email-already-in-use') {
                     alert('Este correo ya está en uso. Por favor, usa otro.');
+                } else if (error.code === 'auth/weak-password') {
+                    alert('La contraseña es muy débil. Por favor, usa una contraseña más fuerte.');
                 } else {
                     alert('Error al crear cuenta: ' + error.message);
                 }
@@ -494,12 +515,17 @@
 
             try {
                 // Sign in with Firebase Auth
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const userCredential = await window.signInWithEmailAndPassword(window.firebaseAuth, email, password);
                 const user = userCredential.user;
 
                 // Get user data from Firestore
-                const userDoc = await get(doc(db, "users", user.uid));
+                const userDoc = await window.getDoc(window.doc(window.firebaseDB, "users", user.uid));
                 const userData = userDoc.data();
+
+                if (!userData) {
+                    alert('Error: Usuario no encontrado en la base de datos');
+                    return;
+                }
 
                 // Login successful
                 currentUser = {
@@ -513,8 +539,11 @@
                 showDashboard();
                 
             } catch (error) {
+                console.error('Error en login:', error);
                 if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
                     alert('Usuario o contraseña incorrectos');
+                } else if (error.code === 'auth/invalid-email') {
+                    alert('Correo inválido');
                 } else {
                     alert('Error al iniciar sesión: ' + error.message);
                 }
@@ -524,7 +553,7 @@
         // Handle logout
         async function logout() {
             try {
-                await signOut(auth);
+                await window.signOut(window.firebaseAuth);
                 currentUser = null;
                 hideDashboard();
                 location.reload();
@@ -562,13 +591,13 @@
             if (!currentUser) return;
             
             try {
-                const messagesQuery = query(
-                    collection(db, "messages"),
-                    where("recipientUsername", "==", currentUser.displayName),
-                    orderBy("createdAt", "desc")
+                const messagesQuery = window.query(
+                    window.collection(window.firebaseDB, "messages"),
+                    window.where("recipientUsername", "==", currentUser.displayName),
+                    window.orderBy("createdAt", "desc")
                 );
                 
-                const querySnapshot = await getDocs(messagesQuery);
+                const querySnapshot = await window.getDocs(messagesQuery);
                 messages = [];
                 querySnapshot.forEach((doc) => {
                     messages.push({
@@ -639,7 +668,7 @@
                     createdAt: new Date().toISOString()
                 };
 
-                await add(collection(db, "messages"), newMessage);
+                await window.addDoc(window.collection(window.firebaseDB, "messages"), newMessage);
 
                 document.getElementById('messageText').value = '';
                 
