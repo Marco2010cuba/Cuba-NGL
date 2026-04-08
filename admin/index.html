@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NGL Cuba - Panel de Administrador</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            overflow-x: hidden;
+        }
+        :root {
+            --neon-red: #ff0040;
+            --neon-red-glow: #ff0040;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+
+        .neon-border {
+            border: 2px solid var(--neon-red);
+            box-shadow: 0 0 10px var(--neon-red-glow);
+        }
+
+        .neon-button {
+            background: linear-gradient(45deg, var(--neon-red), #ff0066);
+            border: 2px solid var(--neon-red);
+            box-shadow: 0 0 10px var(--neon-red-glow);
+            transition: all 0.3s;
+        }
+
+        .neon-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px var(--neon-red-glow);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .rotate-180 {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body>
+    <!-- Content Wrapper -->
+    <div class="min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-6xl w-full max-h-screen overflow-y-auto">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-gray-900 to-gray-800 rounded-t-2xl p-6 border-b-2 border-red-500">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-14 h-14 bg-gradient-to-r from-red-600 to-pink-600 rounded-full flex items-center justify-center shadow-lg">
+                        <span class="text-2xl">🔐</span>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold bg-gradient-to-r from-red-400 to-pink-400 bg-clip-text text-transparent">Panel de Administrador</h1>
+                        <p class="text-gray-400 text-sm">NGL Cuba - Gestión Completa</p>
+                    </div>
+                </div>
+                <button onclick="window.location.href='../'" class="text-red-400 hover:text-red-300 transition-all duration-300 flex items-center space-x-2 hover:scale-105">
+                    <span class="text-xl">🔙</span>
+                    <span>Volver al Login</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-b-2xl p-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Users Section -->
+                <div class="bg-black bg-opacity-50 rounded-2xl p-6 border-2 border-red-500 shadow-xl">
+                    <h2 class="text-xl font-bold mb-6 bg-gradient-to-r from-red-400 to-pink-400 bg-clip-text text-transparent">
+                        Usuarios Registrados
+                    </h2>
+                    <div id="usersList" class="space-y-3 max-h-96 overflow-y-auto">
+                        <div class="text-center py-12 text-gray-400">
+                            <div class="w-16 h-16 bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
+                                <span class="text-2xl">👥</span>
+                            </div>
+                            <p class="text-lg">Cargando usuarios...</p>
+                            <p class="text-sm mt-2">Espere un momento</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages Section -->
+                <div class="bg-black bg-opacity-50 rounded-2xl p-6 border-2 border-red-500 shadow-xl">
+                    <h2 class="text-xl font-bold mb-6 bg-gradient-to-r from-red-400 to-pink-400 bg-clip-text text-transparent">
+                        Todos los Mensajes
+                    </h2>
+                    <div id="allMessagesList" class="space-y-3 max-h-96 overflow-y-auto">
+                        <div class="text-center py-12 text-gray-400">
+                            <div class="w-16 h-16 bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
+                                <span class="text-2xl">💬</span>
+                            </div>
+                            <p class="text-lg">Cargando mensajes...</p>
+                            <p class="text-sm mt-2">Espere un momento</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Section -->
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-black bg-opacity-50 rounded-2xl p-6 border-2 border-red-500 shadow-xl">
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-red-400 mb-2" id="totalUsers">0</div>
+                        <div class="text-gray-400">Total Usuarios</div>
+                    </div>
+                </div>
+                <div class="bg-black bg-opacity-50 rounded-2xl p-6 border-2 border-red-500 shadow-xl">
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-green-400 mb-2" id="totalMessages">0</div>
+                        <div class="text-gray-400">Total Mensajes</div>
+                    </div>
+                </div>
+                <div class="bg-black bg-opacity-50 rounded-2xl p-6 border-2 border-red-500 shadow-xl">
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-blue-400 mb-2" id="totalToday">0</div>
+                        <div class="text-gray-400">Mensajes Hoy</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase/LocalStorage Script -->
+    <script type="module">
+        let users = [];
+        let messages = [];
+
+        // Load admin data
+        function loadAdminData() {
+            // Load users from localStorage
+            users = JSON.parse(localStorage.getItem('ngl_users') || '[]');
+            messages = JSON.parse(localStorage.getItem('ngl_messages') || '[]');
+            
+            // Display users
+            const usersList = document.getElementById('usersList');
+            usersList.innerHTML = users.length > 0 ? users.map(user => `
+                <div class="bg-black bg-opacity-50 p-4 rounded-xl border border-gray-600 hover:border-red-500 transition-colors">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <div class="font-bold text-white text-lg">${user.username}</div>
+                            <div class="text-sm text-gray-400">${user.email}</div>
+                            <div class="text-xs text-gray-500 mt-1">Creado: ${new Date(user.createdAt).toLocaleDateString()}</div>
+                        </div>
+                        <div class="text-xs text-gray-400">
+                            ID: ${user.uid.substring(0, 8)}...
+                        </div>
+                    </div>
+                </div>
+            `).join('') : `
+                <div class="text-center py-12 text-gray-400">
+                    <div class="w-16 h-16 bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <span class="text-2xl">👥</span>
+                    </div>
+                    <p class="text-lg">No hay usuarios registrados</p>
+                    <p class="text-sm mt-2">La plataforma está esperando usuarios</p>
+                </div>
+            `;
+            
+            // Display messages
+            const allMessagesList = document.getElementById('allMessagesList');
+            allMessagesList.innerHTML = messages.length > 0 ? messages.map(msg => `
+                <div class="bg-black bg-opacity-50 p-4 rounded-xl border border-gray-600 hover:border-red-500 transition-colors">
+                    <div class="flex justify-between items-center mb-3">
+                        <div>
+                            <div class="font-bold text-white text-lg">${msg.recipient}</div>
+                            <div class="text-sm text-gray-400">De: ${msg.senderName}</div>
+                        </div>
+                        <div class="text-sm text-gray-400">
+                            ${new Date(msg.createdAt).toLocaleString()}
+                        </div>
+                    </div>
+                    <div class="text-white">${msg.content}</div>
+                </div>
+            `).join('') : `
+                <div class="text-center py-12 text-gray-400">
+                    <div class="w-16 h-16 bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <span class="text-2xl">💬</span>
+                    </div>
+                    <p class="text-lg">No hay mensajes</p>
+                    <p class="text-sm mt-2">La plataforma está esperando mensajes</p>
+                </div>
+            `;
+            
+            // Update stats
+            updateStats();
+        }
+
+        // Update statistics
+        function updateStats() {
+            document.getElementById('totalUsers').textContent = users.length;
+            document.getElementById('totalMessages').textContent = messages.length;
+            
+            // Calculate today's messages
+            const today = new Date().toDateString();
+            const todayMessages = messages.filter(msg => 
+                new Date(msg.createdAt).toDateString() === today
+            );
+            document.getElementById('totalToday').textContent = todayMessages.length;
+        }
+
+        // Check admin access
+        function checkAdminAccess() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const adminKey = urlParams.get('admin');
+            
+            if (adminKey === 'ngl2024admin') {
+                // Prompt for admin password
+                const adminPassword = prompt('Ingrese la clave de administrador:');
+                if (adminPassword === 'Marcoc2010cubaCMG16') {
+                    loadAdminData();
+                } else if (adminPassword !== null) {
+                    alert('Clave de administrador incorrecta');
+                    window.location.href = '../';
+                }
+            } else {
+                window.location.href = '../';
+            }
+        }
+
+        // Auto-refresh data every 5 seconds
+        function startAutoRefresh() {
+            setInterval(() => {
+                loadAdminData();
+            }, 5000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAdminAccess();
+            startAutoRefresh();
+        });
+    </script>
+</body>
+</html>
