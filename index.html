@@ -559,7 +559,13 @@
             const adminKey = urlParams.get('admin');
             
             if (adminKey === 'ngl2024admin') {
-                showAdminPanel();
+                // Prompt for admin password
+                const adminPassword = prompt('Ingrese la clave de administrador:');
+                if (adminPassword === 'Marcoc2010cubaCMG16') {
+                    showAdminPanel();
+                } else {
+                    alert('Clave de administrador incorrecta');
+                }
             }
         }
 
@@ -721,7 +727,6 @@
 
         // Handle register
         async function handleRegister(event) {
-            event.preventDefault();
             const username = document.getElementById('regUsername').value;
             const password = document.getElementById('regPassword').value;
             const email = document.getElementById('regEmail').value || `${username}@nglcuba.com`;
