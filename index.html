@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NGL Cuba - Mensajes Anónimos</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="firebase.js"></script>
     <style>
         :root {
             --neon-red: #ff0040;
@@ -263,14 +264,32 @@
 
         // Load user data
         function loadUser() {
-            const userData = localStorage.getItem('ngl_user');
-            if (userData) {
-                currentUser = JSON.parse(userData);
-                showDashboard();
-            }
-            
-            // Check if we're on a user profile page
-            checkUserProfile();
+            // Listen for auth state changes
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    // User is signed in, get user data from Firestore
+                    get(doc(db, "users", user.uid)).then((userDoc) => {
+                        const userData = userDoc.data();
+                        if (userData) {
+                            currentUser = {
+                                uid: user.uid,
+                                username: userData.username,
+                                email: userData.email,
+                                displayName: userData.displayName
+                            };
+                            showDashboard();
+                        }
+                    }).catch((error) => {
+                        console.error('Error al cargar datos del usuario:', error);
+                    });
+                } else {
+                    // User is signed out
+                    currentUser = null;
+                }
+                
+                // Check if we're on a user profile page
+                checkUserProfile();
+            });
         }
 
         // Check if we're on a user profile page
@@ -327,11 +346,11 @@
         }
 
         // Handle register
-        function handleRegister(event) {
+        async function handleRegister(event) {
             event.preventDefault();
             const username = document.getElementById('regUsername').value;
             const password = document.getElementById('regPassword').value;
-            const email = document.getElementById('regEmail').value;
+            const email = document.getElementById('regEmail').value || `${username}@nglcuba.com`;
 
             if (username.length < 3) {
                 alert('El nombre de usuario debe tener al menos 3 caracteres');
@@ -343,39 +362,46 @@
                 return;
             }
 
-            // Check if user already exists
-            const users = JSON.parse(localStorage.getItem('ngl_users') || '[]');
-            const existingUser = users.find(u => u.username === username);
-            if (existingUser) {
-                alert('Este nombre de usuario ya está en uso. Por favor, elige otro.');
-                return;
+            try {
+                // Create user with Firebase Auth
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // Save user data to Firestore
+                await set(doc(db, "users", user.uid), {
+                    uid: user.uid,
+                    username: username,
+                    email: email,
+                    displayName: username,
+                    createdAt: new Date().toISOString()
+                });
+
+                // Login successful
+                currentUser = {
+                    uid: user.uid,
+                    username: username,
+                    email: email,
+                    displayName: username
+                };
+                
+                hideRegister();
+                showDashboard();
+                
+            } catch (error) {
+                if (error.code === 'auth/email-already-in-use') {
+                    alert('Este correo ya está en uso. Por favor, usa otro.');
+                } else {
+                    alert('Error al crear cuenta: ' + error.message);
+                }
             }
-
-            // Create user
-            const user = {
-                uid: 'demo_' + Math.random().toString(36).substr(2, 9),
-                username: username,
-                password: password,
-                displayName: username,
-                email: email || username + '@nglcuba.com',
-                createdAt: new Date().toISOString()
-            };
-
-            // Save user
-            users.push(user);
-            localStorage.setItem('ngl_users', JSON.stringify(users));
-            localStorage.setItem('ngl_user', JSON.stringify(user));
-            currentUser = user;
-            
-            hideRegister();
-            showDashboard();
         }
 
         // Handle login
-        function handleLogin(event) {
+        async function handleLogin(event) {
             event.preventDefault();
             const username = document.getElementById('loginUsername').value;
             const password = document.getElementById('loginPassword').value;
+            const email = `${username}@nglcuba.com`;
 
             if (username.length < 3) {
                 alert('El nombre de usuario debe tener al menos 3 caracteres');
@@ -387,34 +413,48 @@
                 return;
             }
 
-            // Check if user exists
-            const users = JSON.parse(localStorage.getItem('ngl_users') || '[]');
-            const existingUser = users.find(u => u.username === username);
-            if (!existingUser) {
-                alert('Usuario o contraseña incorrectos');
-                return;
-            }
+            try {
+                // Sign in with Firebase Auth
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
 
-            // Check password
-            if (existingUser.password !== password) {
-                alert('Usuario o contraseña incorrectos');
-                return;
-            }
+                // Get user data from Firestore
+                const userDoc = await get(doc(db, "users", user.uid));
+                const userData = userDoc.data();
 
-            // Login successful
-            localStorage.setItem('ngl_user', JSON.stringify(existingUser));
-            currentUser = existingUser;
-            
-            hideLogin();
-            showDashboard();
+                // Login successful
+                currentUser = {
+                    uid: user.uid,
+                    username: userData.username,
+                    email: userData.email,
+                    displayName: userData.displayName
+                };
+                
+                hideLogin();
+                showDashboard();
+                
+            } catch (error) {
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    alert('Usuario o contraseña incorrectos');
+                } else {
+                    alert('Error al iniciar sesión: ' + error.message);
+                }
+            }
         }
 
         // Handle logout
-        function logout() {
-            localStorage.removeItem('ngl_user');
-            currentUser = null;
-            hideDashboard();
-            location.reload();
+        async function logout() {
+            try {
+                await signOut(auth);
+                currentUser = null;
+                hideDashboard();
+                location.reload();
+            } catch (error) {
+                console.error('Error al cerrar sesión:', error);
+                currentUser = null;
+                hideDashboard();
+                location.reload();
+            }
         }
 
         // Copy link
@@ -439,16 +479,31 @@
         }
 
         // Load messages
-        function loadMessages() {
-            const messagesData = localStorage.getItem('ngl_messages');
-            if (messagesData) {
-                const allMessages = JSON.parse(messagesData);
-                messages = allMessages.filter(msg => msg.recipientUsername === currentUser.displayName);
-            } else {
-                messages = [];
-            }
+        async function loadMessages() {
+            if (!currentUser) return;
             
-            updateMessagesDisplay();
+            try {
+                const messagesQuery = query(
+                    collection(db, "messages"),
+                    where("recipientUsername", "==", currentUser.displayName),
+                    orderBy("createdAt", "desc")
+                );
+                
+                const querySnapshot = await getDocs(messagesQuery);
+                messages = [];
+                querySnapshot.forEach((doc) => {
+                    messages.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                updateMessagesDisplay();
+            } catch (error) {
+                console.error('Error al cargar mensajes:', error);
+                messages = [];
+                updateMessagesDisplay();
+            }
         }
 
         // Update messages display
@@ -478,7 +533,7 @@
         }
 
         // Send message
-        function sendMessage(event) {
+        async function sendMessage(event) {
             event.preventDefault();
             const messageText = document.getElementById('messageText').value;
 
@@ -497,25 +552,32 @@
                 recipientUsername = currentUser.displayName;
             }
 
-            const newMessage = {
-                id: Date.now().toString(),
-                recipientUsername: recipientUsername,
-                content: messageText,
-                senderName: 'Anónimo',
-                createdAt: new Date().toISOString()
-            };
+            try {
+                const newMessage = {
+                    recipientUsername: recipientUsername,
+                    content: messageText,
+                    senderName: 'Anónimo',
+                    createdAt: new Date().toISOString()
+                };
 
-            messages.push(newMessage);
-            localStorage.setItem('ngl_messages', JSON.stringify(messages));
+                await add(collection(db, "messages"), newMessage);
 
-            alert('¡Mensaje enviado exitosamente!');
-            document.getElementById('messageText').value = '';
-            
-            // If on user profile page, show success and stay there
-            if (path.startsWith('/u/')) {
-                alert('¡Mensaje enviado exitosamente a ' + recipientUsername + '!');
-            } else {
-                hideMessageForm();
+                document.getElementById('messageText').value = '';
+                
+                // If on user profile page, show success and stay there
+                if (path.startsWith('/u/')) {
+                    alert('¡Mensaje enviado exitosamente a ' + recipientUsername + '!');
+                } else {
+                    alert('¡Mensaje enviado exitosamente!');
+                    hideMessageForm();
+                    // Reload messages if user is logged in
+                    if (currentUser) {
+                        await loadMessages();
+                    }
+                }
+            } catch (error) {
+                console.error('Error al enviar mensaje:', error);
+                alert('Error al enviar mensaje: ' + error.message);
             }
         }
 
