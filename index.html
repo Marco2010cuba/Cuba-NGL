@@ -57,6 +57,10 @@
         .hidden {
             display: none;
         }
+
+        .rotate-180 {
+            transform: rotate(180deg);
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -71,40 +75,78 @@
 
         <!-- Main Content -->
         <div class="space-y-4">
-            <!-- Register/Login Buttons -->
+            <!-- Login Section -->
             <div class="neon-border rounded-lg p-6">
-                <h2 class="text-xl font-semibold mb-4">Comenzar</h2>
-                <div class="space-y-3">
-                    <button onclick="showRegister()" class="neon-button block text-center py-3 px-6 rounded-lg text-white font-semibold">
-                        Crear Cuenta
-                    </button>
-                    <button onclick="showLogin()" class="neon-button block text-center py-3 px-6 rounded-lg text-white font-semibold">
+                <h2 class="text-2xl font-bold mb-6 text-center" style="color: var(--neon-red); text-shadow: 0 0 10px var(--neon-red-glow);">
+                    Iniciar Sesión
+                </h2>
+                <form onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Nombre de usuario</label>
+                        <input type="text" id="loginUsername" required class="w-full p-4 bg-gray-900 border-2 border-gray-700 rounded-lg text-white text-lg" placeholder="Tu nombre de usuario">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Contraseña</label>
+                        <input type="password" id="loginPassword" required class="w-full p-4 bg-gray-900 border-2 border-gray-700 rounded-lg text-white text-lg" placeholder="Tu contraseña">
+                    </div>
+                    <button type="submit" class="neon-button w-full py-4 rounded-lg text-white font-semibold text-lg">
                         Iniciar Sesión
+                    </button>
+                </form>
+                
+                <div class="mt-6 text-center">
+                    <p class="text-gray-400 mb-3">¿No tienes cuenta?</p>
+                    <button onclick="showRegister()" class="text-blue-400 hover:text-blue-300 transition-colors">
+                        Crear cuenta nueva
                     </button>
                 </div>
             </div>
 
             <!-- Creator Info -->
             <div class="neon-border rounded-lg p-6">
-                <h2 class="text-xl font-semibold mb-4">Acerca del Creador</h2>
-                <div class="text-gray-300">
-                    <p class="mb-2">📧 Email: marco@nglcuba.com</p>
-                    <p class="mb-2">� WhatsApp: +53 1234 5678</p>
-                    <p>💬 Creado para la comunidad cubana</p>
+                <button onclick="toggleCreatorInfo()" class="w-full text-left flex items-center justify-between text-white font-semibold text-lg">
+                    <span>Acerca del creador</span>
+                    <span id="creatorArrow" class="transform transition-transform duration-300">▼</span>
+                </button>
+                
+                <div id="creatorInfo" class="hidden mt-4 space-y-3">
+                    <div class="bg-gray-900 p-4 rounded-lg">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <div class="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center">
+                                <span class="text-xl">👤</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg">Marco</h3>
+                                <p class="text-gray-400">Creador de NGL Cuba</p>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2 text-gray-300">
+                            <p class="flex items-center">
+                                <span class="mr-2">📧</span>
+                                <span>Email: marco@nglcuba.com</span>
+                            </p>
+                            <p class="flex items-center">
+                                <span class="mr-2">📱</span>
+                                <span>WhatsApp: +53 1234 5678</span>
+                            </p>
+                            <p class="flex items-center">
+                                <span class="mr-2">🌍</span>
+                                <span>Cuba 🇨🇺</span>
+                            </p>
+                            <p class="flex items-center">
+                                <span class="mr-2">💬</span>
+                                <span>Plataforma de mensajes anónimos</span>
+                            </p>
+                        </div>
+                        
+                        <div class="mt-4 pt-4 border-t border-gray-700">
+                            <p class="text-sm text-gray-400 text-center">
+                                Creado con ❤️ para la comunidad cubana
+                            </p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-            <!-- Features -->
-            <div class="neon-border rounded-lg p-6">
-                <h2 class="text-xl font-semibold mb-4">Características</h2>
-                <ul class="space-y-2 text-gray-300">
-                    <li>✅ Registro con usuario + contraseña</li>
-                    <li>✅ Mensajes anónimos seguros</li>
-                    <li>✅ Perfiles personalizados</li>
-                    <li>✅ Compartir en WhatsApp</li>
-                    <li>✅ Diseño rojo neón</li>
-                    <li>✅ 100% Funcional</li>
-                </ul>
             </div>
         </div>
 
@@ -362,6 +404,19 @@
 
         function hideMessageForm() {
             document.getElementById('messageForm').classList.add('hidden');
+        }
+
+        function toggleCreatorInfo() {
+            const creatorInfo = document.getElementById('creatorInfo');
+            const creatorArrow = document.getElementById('creatorArrow');
+            
+            if (creatorInfo.classList.contains('hidden')) {
+                creatorInfo.classList.remove('hidden');
+                creatorArrow.classList.add('rotate-180');
+            } else {
+                creatorInfo.classList.add('hidden');
+                creatorArrow.classList.remove('rotate-180');
+            }
         }
 
         function showMessages() {
