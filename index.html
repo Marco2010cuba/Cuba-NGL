@@ -5,7 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NGL Cuba - Mensajes Anónimos</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="firebase.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { getFirestore, collection, doc, set, get, query, where, add, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBnZsF7Y8X9K1L2M3N4O5P6Q7R8S9T0U1V2W",
+            authDomain: "cuba-ngl.firebaseapp.com",
+            projectId: "cuba-ngl",
+            storageBucket: "cuba-ngl.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef123456789012345678"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+    </script>
     <style>
         :root {
             --neon-red: #ff0040;
@@ -70,7 +89,7 @@
                 <h2 class="text-xl font-semibold mb-4">Acerca del Creador</h2>
                 <div class="text-gray-300">
                     <p class="mb-2">📧 Email: marco@nglcuba.com</p>
-                    <p class="mb-2">📱 WhatsApp: +53 1234 5678</p>
+                    <p class="mb-2">� WhatsApp: +53 1234 5678</p>
                     <p>💬 Creado para la comunidad cubana</p>
                 </div>
             </div>
@@ -295,9 +314,14 @@
         // Check if we're on a user profile page
         function checkUserProfile() {
             const path = window.location.pathname;
+            console.log('Current path:', path); // Debug log
+            
             if (path.startsWith('/u/')) {
                 const username = path.substring(3); // Remove '/u/' from path
-                if (username && !currentUser) {
+                console.log('Extracted username:', username); // Debug log
+                
+                if (username && username.length > 0 && !currentUser) {
+                    console.log('Showing message form for:', username); // Debug log
                     showMessageForm(username);
                 }
             }
