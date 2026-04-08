@@ -221,12 +221,14 @@
                 // Prompt for admin password
                 const adminPassword = prompt('Ingrese la clave de administrador:');
                 if (adminPassword === 'Marcoc2010cubaCMG16') {
+                    // Stay on admin page - don't redirect
                     loadAdminData();
                 } else if (adminPassword !== null) {
                     alert('Clave de administrador incorrecta');
-                    window.location.href = '../';
+                    // Stay on admin page - don't redirect
                 }
             } else {
+                // Redirect to main page if no admin key
                 window.location.href = '../';
             }
         }
