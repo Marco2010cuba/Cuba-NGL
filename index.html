@@ -311,14 +311,27 @@
                 return;
             }
 
+            // Check if user already exists
+            const users = JSON.parse(localStorage.getItem('ngl_users') || '[]');
+            const existingUser = users.find(u => u.username === username);
+            if (existingUser) {
+                alert('Este nombre de usuario ya está en uso. Por favor, elige otro.');
+                return;
+            }
+
             // Create user
             const user = {
                 uid: 'demo_' + Math.random().toString(36).substr(2, 9),
+                username: username,
+                password: password,
                 displayName: username,
                 email: email || username + '@nglcuba.com',
                 createdAt: new Date().toISOString()
             };
 
+            // Save user
+            users.push(user);
+            localStorage.setItem('ngl_users', JSON.stringify(users));
             localStorage.setItem('ngl_user', JSON.stringify(user));
             currentUser = user;
             
@@ -342,16 +355,23 @@
                 return;
             }
 
-            // Create user (demo)
-            const user = {
-                uid: 'demo_' + Math.random().toString(36).substr(2, 9),
-                displayName: username,
-                email: username + '@nglcuba.com',
-                createdAt: new Date().toISOString()
-            };
+            // Check if user exists
+            const users = JSON.parse(localStorage.getItem('ngl_users') || '[]');
+            const existingUser = users.find(u => u.username === username);
+            if (!existingUser) {
+                alert('Usuario o contraseña incorrectos');
+                return;
+            }
 
-            localStorage.setItem('ngl_user', JSON.stringify(user));
-            currentUser = user;
+            // Check password
+            if (existingUser.password !== password) {
+                alert('Usuario o contraseña incorrectos');
+                return;
+            }
+
+            // Login successful
+            localStorage.setItem('ngl_user', JSON.stringify(existingUser));
+            currentUser = existingUser;
             
             hideLogin();
             showDashboard();
@@ -390,7 +410,8 @@
         function loadMessages() {
             const messagesData = localStorage.getItem('ngl_messages');
             if (messagesData) {
-                messages = JSON.parse(messagesData);
+                const allMessages = JSON.parse(messagesData);
+                messages = allMessages.filter(msg => msg.recipientUsername === currentUser.displayName);
             } else {
                 messages = [];
             }
@@ -436,7 +457,7 @@
 
             const newMessage = {
                 id: Date.now().toString(),
-                recipientId: currentUser.uid,
+                recipientUsername: currentUser.displayName,
                 content: messageText,
                 senderName: 'Anónimo',
                 createdAt: new Date().toISOString()
