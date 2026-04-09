@@ -1,17 +1,90 @@
 // Variables globales
 let users = [];
 let messages = [];
+let isLoggedIn = false;
 
-// Cargar datos de admin
-function loadAdminData() {
-    // Cargar usuarios desde localStorage
-    users = JSON.parse(localStorage.getItem('ngl_users') || '[]');
-    messages = JSON.parse(localStorage.getItem('ngl_messages') || '[]');
+// Función para verificar acceso y mostrar login
+function checkAccess() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const adminKey = urlParams.get('admin');
+    const hasSession = localStorage.getItem('adminSession');
     
-    // Mostrar usuarios
+    // Siempre mostrar login en /admin/
+    if (window.location.pathname.includes('/admin/')) {
+        if (adminKey === 'ngl2024admin' || hasSession) {
+            if (adminKey === 'ngl2024admin') {
+                // Pedir clave
+                const password = prompt('Ingrese la clave de administrador:');
+                if (password === 'Marcoc2010cubaCMG16') {
+                    loginSuccess();
+                } else if (password !== null) {
+                    alert('Clave incorrecta');
+                }
+            } else if (hasSession) {
+                loginSuccess();
+            }
+        } else {
+            // Pedir clave directamente
+            const password = prompt('Ingrese la clave de administrador:');
+            if (password === 'Marcoc2010cubaCMG16') {
+                loginSuccess();
+            } else if (password !== null) {
+                alert('Clave incorrecta');
+            }
+        }
+    }
+}
+
+// Función de login exitoso
+function loginSuccess() {
+    localStorage.setItem('adminSession', 'true');
+    isLoggedIn = true;
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('adminPanel').classList.remove('hidden');
+    loadData();
+}
+
+// Función para cargar datos desde localStorage (MISMO SISTEMA QUE EL PROYECTO)
+function loadData() {
+    try {
+        // Cargar desde localStorage usando las MISMAS claves que el proyecto principal
+        users = JSON.parse(localStorage.getItem('ngl_users') || '[]');
+        messages = JSON.parse(localStorage.getItem('ngl_messages') || '[]');
+        
+        console.log('Datos cargados del MISMO sistema:', { 
+            users: users.length, 
+            messages: messages.length 
+        });
+        
+        displayUsers();
+        displayMessages();
+        updateStats();
+        
+    } catch (error) {
+        console.error('Error cargando datos:', error);
+        showError('Error al cargar los datos del localStorage');
+    }
+}
+
+// Función para mostrar usuarios (MISMA ESTRUCTURA QUE EL PROYECTO)
+function displayUsers() {
     const usersList = document.getElementById('usersList');
-    usersList.innerHTML = users.length > 0 ? users.map(user => `
-        <div class="bg-black bg-opacity-50 p-4 rounded-xl border border-gray-600 hover:border-red-500 transition-colors">
+    
+    if (users.length === 0) {
+        usersList.innerHTML = `
+            <div class="text-center py-12 text-gray-400">
+                <div class="w-16 h-16 bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <span class="text-2xl">👥</span>
+                </div>
+                <p class="text-lg">No hay usuarios registrados</p>
+                <p class="text-sm mt-2">La plataforma está esperando usuarios</p>
+            </div>
+        `;
+        return;
+    }
+    
+    usersList.innerHTML = users.map(user => `
+        <div class="admin-card p-4 hover-scale">
             <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <div class="font-bold text-white text-lg">${user.username}</div>
@@ -23,24 +96,32 @@ function loadAdminData() {
                 </div>
             </div>
         </div>
-    `).join('') : `
-        <div class="text-center py-12 text-gray-400">
-            <div class="w-16 h-16 bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span class="text-2xl">👥</span>
-            </div>
-            <p class="text-lg">No hay usuarios registrados</p>
-            <p class="text-sm mt-2">La plataforma está esperando usuarios</p>
-        </div>
-    `;
+    `).join('');
+}
+
+// Función para mostrar mensajes (MISMA ESTRUCTURA QUE EL PROYECTO)
+function displayMessages() {
+    const messagesList = document.getElementById('messagesList');
     
-    // Mostrar mensajes
-    const allMessagesList = document.getElementById('allMessagesList');
-    allMessagesList.innerHTML = messages.length > 0 ? messages.map(msg => `
-        <div class="bg-black bg-opacity-50 p-4 rounded-xl border border-gray-600 hover:border-red-500 transition-colors">
+    if (messages.length === 0) {
+        messagesList.innerHTML = `
+            <div class="text-center py-12 text-gray-400">
+                <div class="w-16 h-16 bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <span class="text-2xl">💬</span>
+                </div>
+                <p class="text-lg">No hay mensajes</p>
+                <p class="text-sm mt-2">La plataforma está esperando mensajes</p>
+            </div>
+        `;
+        return;
+    }
+    
+    messagesList.innerHTML = messages.map(msg => `
+        <div class="admin-card p-4 hover-scale">
             <div class="flex justify-between items-center mb-2">
                 <div>
-                    <div class="font-bold text-white text-lg">${msg.recipient}</div>
-                    <div class="text-sm text-gray-400">De: ${msg.senderName}</div>
+                    <div class="font-bold text-white text-lg">${msg.recipientUsername || msg.recipient}</div>
+                    <div class="text-sm text-gray-400">De: ${msg.senderName || 'Anónimo'}</div>
                 </div>
                 <div class="text-sm text-gray-400">
                     ${new Date(msg.createdAt).toLocaleString()}
@@ -48,21 +129,10 @@ function loadAdminData() {
             </div>
             <div class="text-white">${msg.content}</div>
         </div>
-    `).join('') : `
-        <div class="text-center py-12 text-gray-400">
-            <div class="w-16 h-16 bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span class="text-2xl">💬</span>
-            </div>
-            <p class="text-lg">No hay mensajes</p>
-            <p class="text-sm mt-2">La plataforma está esperando mensajes</p>
-        </div>
-    `;
-    
-    // Actualizar estadísticas
-    updateStats();
+    `).join('');
 }
 
-// Actualizar estadísticas
+// Función para actualizar estadísticas
 function updateStats() {
     document.getElementById('totalUsers').textContent = users.length;
     document.getElementById('totalMessages').textContent = messages.length;
@@ -75,52 +145,48 @@ function updateStats() {
     document.getElementById('totalToday').textContent = todayMessages.length;
 }
 
-// Verificar acceso de admin
-function checkAdminAccess() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const adminKey = urlParams.get('admin');
-    
-    // Verificar si ya tiene sesión de admin
-    const hasAdminSession = localStorage.getItem('adminSession');
-    
-    if (adminKey === 'ngl2024admin' || hasAdminSession) {
-        if (adminKey === 'ngl2024admin') {
-            // Pedir clave de administrador
-            const adminPassword = prompt('Ingrese la clave de administrador:');
-            if (adminPassword === 'Marcoc2010cubaCMG16') {
-                // Establecer sesión de admin y cargar datos
-                localStorage.setItem('adminSession', 'true');
-                loadAdminData();
-            } else if (adminPassword !== null) {
-                alert('Clave de administrador incorrecta');
-            }
-        } else {
-            // Ya tiene sesión, solo cargar datos
-            loadAdminData();
-        }
-    } else {
-        // Redirigir a página principal si no hay clave de admin ni sesión
-        window.location.href = '../';
-    }
+// Función para refrescar datos
+function refreshData() {
+    console.log('Refrescando datos...');
+    loadData();
 }
 
-// Cerrar sesión de admin
-function logoutAdmin() {
-    // Limpiar sesión de admin
+// Función para cerrar sesión
+function logout() {
     localStorage.removeItem('adminSession');
-    // Redirigir a página principal
-    window.location.href = '../';
+    isLoggedIn = false;
+    document.getElementById('adminPanel').classList.add('hidden');
+    document.getElementById('loginScreen').classList.remove('hidden');
 }
 
-// Auto-refrescar datos cada 5 segundos
-function startAutoRefresh() {
-    setInterval(() => {
-        loadAdminData();
-    }, 5000);
+// Función para mostrar error
+function showError(message) {
+    const usersList = document.getElementById('usersList');
+    const messagesList = document.getElementById('messagesList');
+    
+    const errorHTML = `
+        <div class="text-center py-12 text-red-400">
+            <div class="w-16 h-16 bg-red-900 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <span class="text-2xl">❌</span>
+            </div>
+            <p class="text-lg">${message}</p>
+            <p class="text-sm mt-2">Intenta recargar la página</p>
+        </div>
+    `;
+    
+    usersList.innerHTML = errorHTML;
+    messagesList.innerHTML = errorHTML;
 }
 
-// Inicializar
+// Auto-refresco cada 30 segundos
+setInterval(() => {
+    if (isLoggedIn) {
+        refreshData();
+    }
+}, 30000);
+
+// Inicializar cuando la página carga
 document.addEventListener('DOMContentLoaded', function() {
-    checkAdminAccess();
-    startAutoRefresh();
+    console.log('Panel de administrador cargado');
+    checkAccess();
 });

@@ -54,14 +54,65 @@ body, html {
 }
 
 ::-webkit-scrollbar-track {
-    background: #1a1a1a;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
     background: var(--neon-red);
-    border-radius: 4px;
+    border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
     background: #ff0066;
+}
+
+/* Efectos hover */
+.hover-scale {
+    transition: transform 0.3s ease;
+}
+
+.hover-scale:hover {
+    transform: scale(1.05);
+}
+
+/* Gradientes */
+.gradient-text {
+    background: linear-gradient(45deg, #ff0040, #ff0066);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.gradient-bg {
+    background: linear-gradient(45deg, #1a1a1a, #2d2d2d);
+}
+
+/* Cards */
+.admin-card {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 0, 64, 0.3);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.admin-card:hover {
+    border-color: rgba(255, 0, 64, 0.6);
+    box-shadow: 0 0 20px rgba(255, 0, 64, 0.3);
+}
+
+/* Loading animation */
+.loading-spinner {
+    border: 3px solid rgba(255, 0, 64, 0.3);
+    border-top: 3px solid #ff0040;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

@@ -8,8 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-    <!-- Mensaje de carga -->
-    <div id="loadingMessage" class="min-h-screen flex items-center justify-center p-4">
+    <!-- Pantalla de Login -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
         <div class="text-center">
             <div class="w-20 h-20 bg-gradient-to-r from-red-600 to-pink-600 rounded-full mx-auto mb-6 flex items-center justify-center shadow-lg">
                 <span class="text-3xl">🔐</span>
@@ -27,88 +27,88 @@
         </div>
     </div>
 
-    <!-- Contenido del panel de administrador -->
-    <div id="adminContent" style="display: none;">
-        <div class="min-h-screen flex items-center justify-center p-4">
-            <div class="max-w-6xl w-full max-h-screen overflow-y-auto">
-                <div class="bg-gradient-to-r from-gray-900 to-gray-800 rounded-t-2xl p-6 border-b-2 border-red-500">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-4">
-                            <div class="w-14 h-14 bg-gradient-to-r from-red-600 to-pink-600 rounded-full flex items-center justify-center shadow-lg">
-                                <span class="text-2xl">🔐</span>
-                            </div>
-                            <div>
-                                <h1 class="text-2xl font-bold bg-gradient-to-r from-red-400 to-pink-400 bg-clip-text text-transparent">Panel de Administrador</h1>
-                                <p class="text-gray-400 text-sm">NGL Cuba - Gestión Completa</p>
-                            </div>
+    <!-- Panel de Administrador -->
+    <div id="adminPanel" class="min-h-screen hidden">
+        <div class="bg-gradient-to-r from-gray-900 to-gray-800 p-6 border-b-2 border-red-500">
+            <div class="max-w-7xl mx-auto flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-14 h-14 bg-gradient-to-r from-red-600 to-pink-600 rounded-full flex items-center justify-center shadow-lg">
+                        <span class="text-2xl">🔐</span>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold bg-gradient-to-r from-red-400 to-pink-400 bg-clip-text text-transparent">Panel de Administrador</h1>
+                        <p class="text-gray-400 text-sm">NGL Cuba - Gestión Completa</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="window.open('../', '_blank')" class="text-gray-400 hover:text-gray-300 transition-all duration-300 flex items-center space-x-2 hover:scale-105">
+                        <span class="text-xl">🏠</span>
+                        <span>Abrir Login</span>
+                    </button>
+                    <button onclick="refreshData()" class="text-red-400 hover:text-red-300 transition-all duration-300 flex items-center space-x-2 hover:scale-105">
+                        <span class="text-xl">🔄</span>
+                        <span>Actualizar Datos</span>
+                    </button>
+                    <button onclick="logout()" class="text-orange-400 hover:text-orange-300 transition-all duration-300 flex items-center space-x-2 hover:scale-105">
+                        <span class="text-xl">🚪</span>
+                        <span>Cerrar Sesión</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-gray-900 to-gray-800 p-6">
+            <div class="max-w-7xl mx-auto">
+                <!-- Estadísticas -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-black bg-opacity-50 rounded-2xl p-6 border-2 border-red-500 shadow-xl">
+                        <div class="text-center">
+                            <div class="text-4xl font-bold text-red-400 mb-2" id="totalUsers">0</div>
+                            <div class="text-gray-400">Total Usuarios</div>
                         </div>
-                        <div class="flex items-center space-x-4">
-                            <button onclick="window.open('../', '_blank')" class="text-gray-400 hover:text-gray-300 transition-all duration-300 flex items-center space-x-2 hover:scale-105">
-                                <span class="text-xl">🏠</span>
-                                <span>Abrir Login</span>
-                            </button>
-                            <button onclick="location.reload()" class="text-red-400 hover:text-red-300 transition-all duration-300 flex items-center space-x-2 hover:scale-105">
-                                <span class="text-xl">🔄</span>
-                                <span>Actualizar Datos</span>
-                            </button>
-                            <button onclick="logoutAdmin()" class="text-orange-400 hover:text-orange-300 transition-all duration-300 flex items-center space-x-2 hover:scale-105">
-                                <span class="text-xl">🚪</span>
-                                <span>Cerrar Sesión</span>
-                            </button>
+                    </div>
+                    <div class="bg-black bg-opacity-50 rounded-2xl p-6 border-2 border-red-500 shadow-xl">
+                        <div class="text-center">
+                            <div class="text-4xl font-bold text-green-400 mb-2" id="totalMessages">0</div>
+                            <div class="text-gray-400">Total Mensajes</div>
+                        </div>
+                    </div>
+                    <div class="bg-black bg-opacity-50 rounded-2xl p-6 border-2 border-red-500 shadow-xl">
+                        <div class="text-center">
+                            <div class="text-4xl font-bold text-blue-400 mb-2" id="totalToday">0</div>
+                            <div class="text-gray-400">Mensajes Hoy</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-b-2xl p-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-black bg-opacity-50 rounded-2xl p-6 border-2 border-red-500 shadow-xl">
-                            <h2 class="text-xl font-bold mb-6 bg-gradient-to-r from-red-400 to-pink-400 bg-clip-text text-transparent">
-                                Usuarios Registrados
-                            </h2>
-                            <div id="usersList" class="space-y-3 max-h-96 overflow-y-auto">
-                                <div class="text-center py-12 text-gray-400 fade-in">
-                                    <div class="w-16 h-16 bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
-                                        <span class="text-2xl">👥</span>
-                                    </div>
-                                    <p class="text-lg">Cargando usuarios...</p>
-                                    <p class="text-sm mt-2">Conectando con la base de datos...</p>
+                <!-- Usuarios y Mensajes -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-black bg-opacity-50 rounded-2xl p-6 border-2 border-red-500 shadow-xl">
+                        <h2 class="text-xl font-bold mb-6 bg-gradient-to-r from-red-400 to-pink-400 bg-clip-text text-transparent">
+                            Usuarios Registrados
+                        </h2>
+                        <div id="usersList" class="space-y-3 max-h-96 overflow-y-auto">
+                            <div class="text-center py-12 text-gray-400">
+                                <div class="w-16 h-16 bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
+                                    <span class="text-2xl">👥</span>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-black bg-opacity-50 rounded-2xl p-6 border-2 border-red-500 shadow-xl">
-                            <h2 class="text-xl font-bold mb-6 bg-gradient-to-r from-red-400 to-pink-400 bg-clip-text text-transparent">
-                                Todos los Mensajes
-                            </h2>
-                            <div id="allMessagesList" class="space-y-3 max-h-96 overflow-y-auto">
-                                <div class="text-center py-12 text-gray-400 fade-in">
-                                    <div class="w-16 h-16 bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
-                                        <span class="text-2xl">💬</span>
-                                    </div>
-                                    <p class="text-lg">Cargando mensajes...</p>
-                                    <p class="text-sm mt-2">Conectando con la base de datos...</p>
-                                </div>
+                                <p class="text-lg">Cargando usuarios...</p>
+                                <p class="text-sm mt-2">Conectando con la base de datos...</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="bg-black bg-opacity-50 rounded-2xl p-6 border-2 border-red-500 shadow-xl">
-                            <div class="text-center">
-                                <div class="text-4xl font-bold text-red-400 mb-2" id="totalUsers">0</div>
-                                <div class="text-gray-400">Total Usuarios</div>
-                            </div>
-                        </div>
-                        <div class="bg-black bg-opacity-50 rounded-2xl p-6 border-2 border-red-500 shadow-xl">
-                            <div class="text-center">
-                                <div class="text-4xl font-bold text-green-400 mb-2" id="totalMessages">0</div>
-                                <div class="text-gray-400">Total Mensajes</div>
-                            </div>
-                        </div>
-                        <div class="bg-black bg-opacity-50 rounded-2xl p-6 border-2 border-red-500 shadow-xl">
-                            <div class="text-center">
-                                <div class="text-4xl font-bold text-blue-400 mb-2" id="totalToday">0</div>
-                                <div class="text-gray-400">Mensajes Hoy</div>
+                    <div class="bg-black bg-opacity-50 rounded-2xl p-6 border-2 border-red-500 shadow-xl">
+                        <h2 class="text-xl font-bold mb-6 bg-gradient-to-r from-red-400 to-pink-400 bg-clip-text text-transparent">
+                            Todos los Mensajes
+                        </h2>
+                        <div id="messagesList" class="space-y-3 max-h-96 overflow-y-auto">
+                            <div class="text-center py-12 text-gray-400">
+                                <div class="w-16 h-16 bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
+                                    <span class="text-2xl">💬</span>
+                                </div>
+                                <p class="text-lg">Cargando mensajes...</p>
+                                <p class="text-sm mt-2">Conectando con la base de datos...</p>
                             </div>
                         </div>
                     </div>
@@ -117,253 +117,6 @@
         </div>
     </div>
 
-    <script>
-        // Variables globales
-        let users = [];
-        let messages = [];
-
-        // Función para cargar datos desde localStorage
-        function loadAdminData() {
-            try {
-                // Intentar cargar desde localStorage primero
-                users = JSON.parse(localStorage.getItem('ngl_users') || '[]');
-                messages = JSON.parse(localStorage.getItem('ngl_messages') || '[]');
-                
-                console.log('Datos cargados desde localStorage:', { users: users.length, messages: messages.length });
-                
-                // Si hay datos locales, mostrarlos
-                if (users.length > 0 || messages.length > 0) {
-                    displayLocalData();
-                    return;
-                }
-                
-                // Si no hay datos locales, cargar desde API online
-                loadOnlineData();
-                
-            } catch (error) {
-                console.error('Error cargando desde localStorage:', error);
-                users = [];
-                messages = [];
-                loadOnlineData();
-            }
-        }
-
-        // Función para mostrar datos locales
-        function displayLocalData() {
-            console.log('Mostrando datos locales...');
-            
-            // Mostrar usuarios
-            const usersList = document.getElementById('usersList');
-            usersList.innerHTML = users.map(user => `
-                <div class="bg-black bg-opacity-50 p-4 rounded-xl border border-gray-600 hover:border-red-500 transition-colors">
-                    <div class="flex justify-between items-start">
-                        <div class="flex-1">
-                            <div class="font-bold text-white text-lg">${user.username}</div>
-                            <div class="text-sm text-gray-400">${user.email}</div>
-                            <div class="text-xs text-gray-500 mt-1">Creado: ${new Date(user.createdAt).toLocaleDateString()}</div>
-                        </div>
-                        <div class="text-xs text-gray-400">
-                            ID: ${user.uid.substring(0, 8)}...
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            
-            // Mostrar mensajes
-            const allMessagesList = document.getElementById('allMessagesList');
-            allMessagesList.innerHTML = messages.map(msg => `
-                <div class="bg-black bg-opacity-50 p-4 rounded-xl border border-gray-600 hover:border-red-500 transition-colors">
-                    <div class="flex justify-between items-center mb-2">
-                        <div>
-                            <div class="font-bold text-white text-lg">${msg.recipient}</div>
-                            <div class="text-sm text-gray-400">De: ${msg.senderName || 'Anónimo'}</div>
-                        </div>
-                        <div class="text-sm text-gray-400">
-                            ${new Date(msg.createdAt).toLocaleString()}
-                        </div>
-                    </div>
-                    <div class="text-white">${msg.content}</div>
-                </div>
-            `).join('');
-            
-            // Actualizar estadísticas
-            updateStats();
-        }
-
-        // Función para cargar datos online
-        function loadOnlineData() {
-            console.log('Cargando datos desde API online...');
-            
-            // URLs de la API (simuladas para este ejemplo)
-            const API_URL = 'https://api.nglcuba.cubaweb.com';
-            
-            // Cargar usuarios
-            fetch(`${API_URL}/users`)
-                .then(response => response.json())
-                .then(data => {
-                    users = data;
-                    console.log('Usuarios cargados desde API:', users.length);
-                    
-                    // Mostrar usuarios
-                    const usersList = document.getElementById('usersList');
-                    usersList.innerHTML = users.map(user => `
-                        <div class="bg-black bg-opacity-50 p-4 rounded-xl border border-gray-600 hover:border-red-500 transition-colors">
-                            <div class="flex justify-between items-start">
-                                <div class="flex-1">
-                                    <div class="font-bold text-white text-lg">${user.username}</div>
-                                    <div class="text-sm text-gray-400">${user.email}</div>
-                                    <div class="text-xs text-gray-500 mt-1">Creado: ${new Date(user.createdAt).toLocaleDateString()}</div>
-                                </div>
-                                <div class="text-xs text-gray-400">
-                                    ID: ${user.uid.substring(0, 8)}...
-                                </div>
-                            </div>
-                        </div>
-                    `).join('');
-                    
-                    // Cargar mensajes
-                    return fetch(`${API_URL}/messages`)
-                        .then(response => response.json())
-                        .then(data => {
-                            messages = data;
-                            console.log('Mensajes cargados desde API:', messages.length);
-                            
-                            // Mostrar mensajes
-                            const allMessagesList = document.getElementById('allMessagesList');
-                            allMessagesList.innerHTML = messages.map(msg => `
-                                <div class="bg-black bg-opacity-50 p-4 rounded-xl border border-gray-600 hover:border-red-500 transition-colors">
-                                    <div class="flex justify-between items-center mb-2">
-                                        <div>
-                                            <div class="font-bold text-white text-lg">${msg.recipient}</div>
-                                            <div class="text-sm text-gray-400">De: ${msg.senderName || 'Anónimo'}</div>
-                                        </div>
-                                        <div class="text-sm text-gray-400">
-                                            ${new Date(msg.createdAt).toLocaleString()}
-                                        </div>
-                                    </div>
-                                    <div class="text-white">${msg.content}</div>
-                                </div>
-                            `).join('');
-                            
-                            // Actualizar estadísticas
-                            updateStats();
-                        })
-                        .catch(error => {
-                            console.error('Error cargando mensajes desde API:', error);
-                            
-                            // Mostrar error de carga
-                            const allMessagesList = document.getElementById('allMessagesList');
-                            allMessagesList.innerHTML = `
-                                <div class="text-center py-12 text-red-400">
-                                    <div class="w-16 h-16 bg-red-900 rounded-full mx-auto mb-4 flex items-center justify-center">
-                                        <span class="text-2xl">❌</span>
-                                    </div>
-                                    <p class="text-lg">Error cargando mensajes</p>
-                                    <p class="text-sm mt-2">Intenta recargar la página</p>
-                                </div>
-                            `;
-                        });
-                })
-                .catch(error => {
-                    console.error('Error cargando usuarios desde API:', error);
-                    
-                    // Mostrar error de carga
-                    const usersList = document.getElementById('usersList');
-                    usersList.innerHTML = `
-                        <div class="text-center py-12 text-red-400">
-                            <div class="w-16 h-16 bg-red-900 rounded-full mx-auto mb-4 flex items-center justify-center">
-                                <span class="text-2xl">❌</span>
-                            </div>
-                            <p class="text-lg">Error cargando usuarios</p>
-                            <p class="text-sm mt-2">Intenta recargar la página</p>
-                        </div>
-                    `;
-                });
-        }
-
-        // Actualizar estadísticas
-        function updateStats() {
-            document.getElementById('totalUsers').textContent = users.length;
-            document.getElementById('totalMessages').textContent = messages.length;
-            
-            // Calcular mensajes de hoy
-            const today = new Date().toDateString();
-            const todayMessages = messages.filter(msg => 
-                new Date(msg.createdAt).toDateString() === today
-            );
-            document.getElementById('totalToday').textContent = todayMessages.length;
-        }
-
-        // Verificar acceso de admin
-        function checkAdminAccess() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const adminKey = urlParams.get('admin');
-            
-            // Verificar si ya tiene sesión de admin
-            const hasAdminSession = localStorage.getItem('adminSession');
-            
-            // Siempre mostrar el panel de admin en /admin/ - NUNCA REDIRIGIR
-            if (window.location.pathname.includes('/admin/')) {
-                if (adminKey === 'ngl2024admin' || hasAdminSession) {
-                    if (adminKey === 'ngl2024admin') {
-                        // Pedir clave de administrador
-                        const adminPassword = prompt('Ingrese la clave de administrador:');
-                        if (adminPassword === 'Marcoc2010cubaCMG16') {
-                            // Establecer sesión de admin y cargar datos
-                            localStorage.setItem('adminSession', 'true');
-                            showAdminPanel();
-                            loadAdminData();
-                        } else if (adminPassword !== null) {
-                            alert('Clave de administrador incorrecta');
-                        }
-                    } else {
-                        // Ya tiene sesión, mostrar panel
-                        showAdminPanel();
-                        loadAdminData();
-                    }
-                } else {
-                    // Pedir clave de administrador directamente
-                    const adminPassword = prompt('Ingrese la clave de administrador:');
-                    if (adminPassword === 'Marcoc2010cubaCMG16') {
-                        // Establecer sesión de admin y mostrar panel
-                        localStorage.setItem('adminSession', 'true');
-                        showAdminPanel();
-                        loadAdminData();
-                    } else if (adminPassword !== null) {
-                        alert('Clave de administrador incorrecta');
-                    } else {
-                        // Si cancela, mantenerse en la página de admin
-                        return;
-                    }
-                }
-            } else {
-                // Solo redirigir si NO está en /admin/ y no hay sesión
-                if (!hasAdminSession) {
-                    window.location.href = '../';
-                }
-            }
-        }
-
-        // Mostrar panel de administrador completo
-        function showAdminPanel() {
-            // Ocultar mensaje de carga y mostrar panel completo
-            document.getElementById('adminContent').style.display = 'block';
-            document.getElementById('loadingMessage').style.display = 'none';
-        }
-
-        // Cerrar sesión de admin
-        function logoutAdmin() {
-            // Limpiar sesión de admin
-            localStorage.removeItem('adminSession');
-            // Redirigir a página principal
-            window.location.href = '../';
-        }
-
-        // Inicializar cuando la página carga
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Panel de administrador cargado');
-            checkAdminAccess();
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
