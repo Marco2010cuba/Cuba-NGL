@@ -302,7 +302,7 @@
             // Verificar si ya tiene sesión de admin
             const hasAdminSession = localStorage.getItem('adminSession');
             
-            // Siempre mostrar el panel de admin en /admin/
+            // Siempre mostrar el panel de admin en /admin/ - NUNCA REDIRIGIR
             if (window.location.pathname.includes('/admin/')) {
                 if (adminKey === 'ngl2024admin' || hasAdminSession) {
                     if (adminKey === 'ngl2024admin') {
@@ -331,16 +331,16 @@
                         loadAdminData();
                     } else if (adminPassword !== null) {
                         alert('Clave de administrador incorrecta');
-                        // Redirigir a página principal
-                        window.location.href = '../';
                     } else {
-                        // Redirigir a página principal
-                        window.location.href = '../';
+                        // Si cancela, mantenerse en la página de admin
+                        return;
                     }
                 }
             } else {
-                // Redirigir a página principal si no está en /admin/
-                window.location.href = '../';
+                // Solo redirigir si NO está en /admin/ y no hay sesión
+                if (!hasAdminSession) {
+                    window.location.href = '../';
+                }
             }
         }
 
