@@ -148,7 +148,7 @@
                         
                         <div class="mt-6 pt-6 border-t-2 border-gray-600">
                             <p class="text-sm text-gray-400 text-center">
-                                Creado con ❤️ para la comunidad cubana
+                                Creado de corazon para la comunidad cubana
                             </p>
                         </div>
                     </div>
@@ -610,17 +610,30 @@
 
         // Handle register
         async function handleRegister(event) {
-            const username = document.getElementById('regUsername').value;
-            const password = document.getElementById('regPassword').value;
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value.trim();
             const email = document.getElementById('regEmail').value || `${username}@nglcuba.com`;
 
-            if (username.length < 3) {
-                alert('El nombre de usuario debe tener al menos 3 caracteres');
+            console.log('Validating registration:', { username: username, password: password, usernameLength: username.length, passwordLength: password.length });
+
+            if (username.length < 5) {
+                alert('El nombre de usuario debe tener al menos 5 caracteres');
                 return;
             }
 
-            if (password.length < 6) {
-                alert('La contraseña debe tener al menos 6 caracteres');
+            if (password.length < 5) {
+                alert('La contraseña debe tener al menos 5 caracteres');
+                return;
+            }
+
+            // Additional validation for better user experience
+            if (username.length > 20) {
+                alert('El nombre de usuario no puede tener más de 20 caracteres');
+                return;
+            }
+
+            if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+                alert('El nombre de usuario solo puede contener letras, números y guiones bajos');
                 return;
             }
 
@@ -668,17 +681,20 @@
         // Handle login
         async function handleLogin(event) {
             event.preventDefault();
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
             const email = `${username}@nglcuba.com`;
 
-            if (username.length < 3) {
-                alert('El nombre de usuario debe tener al menos 3 caracteres');
+            console.log('Login attempt:', { username: username, password: password, usernameLength: username.length, passwordLength: password.length });
+
+            // Clear any cached validation
+            if (username.length < 5) {
+                alert('El nombre de usuario debe tener al menos 5 caracteres');
                 return;
             }
 
-            if (password.length < 6) {
-                alert('La contraseña debe tener al menos 6 caracteres');
+            if (password.length < 5) {
+                alert('La contraseña debe tener al menos 5 caracteres');
                 return;
             }
 
@@ -690,30 +706,24 @@
                 // Get user data from localStorage
                 const users = JSON.parse(localStorage.getItem('ngl_users') || '[]');
                 const userData = users.find(u => u.email === email && u.password === password);
-
-                if (!userData) {
-                    alert('Usuario o contraseña incorrectos');
-                    return;
-                }
-
-                // Save current user session
-                localStorage.setItem('ngl_current_user', JSON.stringify(userData));
-
-                // Login successful
-                currentUser = userData;
                 
-                hideLogin();
-                showDashboard();
+                if (userData) {
+                    // Save current user session
+                    localStorage.setItem('ngl_current_user', JSON.stringify(userData));
+                    currentUser = userData;
+                    
+                    hideLogin();
+                    showDashboard();
+                    // Clear cache and force reload
+                    localStorage.clear();
+                    window.location.reload(true);
+                } else {
+                    alert('Usuario o contraseña incorrectos');
+                }
                 
             } catch (error) {
                 console.error('Error en login:', error);
-                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-                    alert('Usuario o contraseña incorrectos');
-                } else if (error.code === 'auth/invalid-email') {
-                    alert('Correo inválido');
-                } else {
-                    alert('Error al iniciar sesión: ' + error.message);
-                }
+                alert('Error al iniciar sesión: ' + error.message);
             }
         }
 
