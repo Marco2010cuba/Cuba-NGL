@@ -1,0 +1,14 @@
+{
+  "name": "nglcuba-admin",
+  "version": "1.0.0",
+  "description": "Panel de Administrador de NGL Cuba",
+  "main": "admin/index.html",
+  "scripts": {
+    "dev": "python -m http.server 8000",
+    "build": "echo 'No build needed - static files'",
+    "start": "python -m http.server 8000"
+  },
+  "keywords": ["admin", "ngl", "cuba"],
+  "author": "Marco",
+  "license": "MIT"
+}
